@@ -2,7 +2,7 @@
 {
     internal class ConsoleLayout
     {
-        Probability P = new Probability();
+        private readonly Probability P = new();
         private readonly Dictionary<int, float> diceresult = new();
         public ConsoleLayout(int dicenum) {
             Probability p = new(dicenum);
