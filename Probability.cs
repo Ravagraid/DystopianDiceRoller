@@ -55,11 +55,11 @@ internal class Probability
                 return output;
 
             case 7: // Devastating
-                output = HitCases(false, 0, true, true);
+                output = HitCases(false, 0, true, false);
                 return output;
 
             case 8: // Devastating vs Obscured
-                output = HitCases(true, 0, true, true);
+                output = HitCases(true, 0, true, false);
                 return output;
         }
     }
@@ -70,12 +70,8 @@ internal class Probability
 
         Blanks = Results[0] + ExpDice(Obscured);
         SingleHits = results[3] + ExpDice(Obscured);
-
-        HeavyHits = HeavyToSingle ? results[4] : results[4] * 2;
-        HeavyHits += ExpDice(Obscured);
-
-        ExplodingHits = Devastating ? results[5] * 3 : results[5] * 2;
-        ExplodingHits += ExpDice(Obscured);
+        HeavyHits = results[4]+ ExpDice(Obscured);
+        ExplodingHits = results[5] + ExpDice(Obscured);
 
         for (int i = 0; i < NumOfRerolls; i++)
         {
@@ -83,6 +79,11 @@ internal class Probability
             HeavyHits += Blanks / 6;
             ExplodingHits += Blanks / 6;
         }
+
+        if (!HeavyToSingle) { HeavyHits *= 2; }
+
+        if (Devastating) { ExplodingHits *= 3; }
+        else { ExplodingHits *= 2; }
 
         output = SingleHits + HeavyHits + ExplodingHits;
         return output;
