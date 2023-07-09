@@ -61,11 +61,15 @@
             table.AddColumn("Scenario");
             table.AddColumn("Total Hits");
 
-            table.AddRow("Standard",Convert.ToString(P.TotalHits(0)));
+            table.AddRow("Normal",Convert.ToString(P.TotalHits(0)));
             table.AddRow("Normal vs Obscured", Convert.ToString(P.TotalHits(1)));
-            table.AddRow("Sustained/Homing", Convert.ToString(P.TotalHits(2)));
-            table.AddRow("Sustained/Homing vs Obscured", Convert.ToString(P.TotalHits(3)));
-
+            table.AddRow("Heavy Hits Count As Singles", Convert.ToString(P.TotalHits(2)));
+            table.AddRow("Sustained/Homing", Convert.ToString(P.TotalHits(3)));
+            table.AddRow("Sustained/Homing vs Obscured", Convert.ToString(P.TotalHits(4)));
+            table.AddRow("Fusilade", Convert.ToString(P.TotalHits(5)));
+            table.AddRow("Fusilade vs Obscured", Convert.ToString(P.TotalHits(6)));
+            table.AddRow("Devastating", Convert.ToString(P.TotalHits(7)));
+            table.AddRow("Devastating vs Obscured", Convert.ToString(P.TotalHits(8)));
             return table;
         }
     }

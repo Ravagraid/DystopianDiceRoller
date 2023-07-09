@@ -16,7 +16,7 @@ internal class Probability
     }
 
     public Dictionary<int, float> Results => results;
-    // Combines relevant hits into a single dice total.
+     //Combines relevant hits into a single dice total.
     public float TotalHits(int Scenario)
     {
         float output;
@@ -25,51 +25,64 @@ internal class Probability
         {
             default: //In case something goes fucky
                 return 0;
+
             case 0: //Normal Total Number
-                output = HitCases(true);
+                output = HitCases(false, 0, false, false);
                 return output;
 
             case 1: //Normal vs Obscured
-                output = HitCases(false);
+                output = HitCases(true, 0, false, false);
                 return output;
 
-            case 2: //Sustained/Homing
-                output = HitCases(true);
+            case 2: //Heavy Hits become single hits
+                output = HitCases(false, 0, false, true);
                 return output;
 
-            case 3: // Sustained/Homing vs Obscured
-                output = HitCases(false);
+            case 3: //Sustained/Homing
+                output = HitCases(false, 1, false, false);
                 return output;
 
-            case 4: //Fusilade
-                output = HitCases(true);
+            case 4:  //Sustained/Homing vs Obscured
+                output = HitCases(true, 1, false, false);
                 return output;
 
-            case 5: // Fusilade vs Obscured
-                output = HitCases(false);
+            case 5: //Fusilade
+                output = HitCases(false, 2, false, false);
+                return output;
+
+            case 6:  //Fusilade vs Obscured
+                output = HitCases(true, 2, false, false);
+                return output;
+
+            case 7: // Devastating
+                output = HitCases(false, 0, true, true);
+                return output;
+
+            case 8: // Devastating vs Obscured
+                output = HitCases(true, 0, true, true);
                 return output;
         }
     }
 
-    internal float HitCases(bool Obscured /*bool singlereroll*/)
+    internal float HitCases(bool Obscured, int NumOfRerolls, bool Devastating, bool HeavyToSingle)
     {
-        float output, Blanks, Counters, HeavyCounters, SingleHits, HeavyHits, ExplodingHits;
-
+        float output, Blanks, SingleHits, HeavyHits, ExplodingHits;
 
         Blanks = Results[0] + ExpDice(Obscured);
-        Counters = Results[1] + ExpDice(Obscured);
-        HeavyCounters = Results[2] + ExpDice(Obscured);
         SingleHits = results[3] + ExpDice(Obscured);
-        HeavyHits = (results[4] * 2) + ExpDice(Obscured);
-        ExplodingHits = (results[5] * 2) + ExpDice(Obscured);
 
-        //if (singlereroll)
-        //{
-        //    SingleHits += Blanks / 6;
-        //    HeavyHits += Blanks / 6;
-        //    ExplodingHits += Blanks / 6;
-        //    output = SingleHits + HeavyHits + ExplodingHits;
-        //}
+        HeavyHits = HeavyToSingle ? results[4] : results[4] * 2;
+        HeavyHits += ExpDice(Obscured);
+
+        ExplodingHits = Devastating ? results[5] * 3 : results[5] * 2;
+        ExplodingHits += ExpDice(Obscured);
+
+        for (int i = 0; i < NumOfRerolls; i++)
+        {
+            SingleHits += Blanks / 6;
+            HeavyHits += Blanks / 6;
+            ExplodingHits += Blanks / 6;
+        }
 
         output = SingleHits + HeavyHits + ExplodingHits;
         return output;
@@ -81,14 +94,15 @@ internal class Probability
         float initResult = results[0];
         float temp1, temp2, output = 0;
 
-        //if Obscured is true, loop 3 times. If false, loop once.
-        int LoopNum = Obscured ? 2 : 0;
+        //if Obscured is true, loop 0 times. If false, loop 3 times.
+        int LoopNum = Obscured ? 0 : 4;
+        
+        temp1 = initResult / 6;
 
         //loops through initial result to generate additional hits from exploding dice
         //simulates diminishing returns from Exploding Hits.
         for (int i = 0; i < LoopNum; i++)
         {
-            temp1 = initResult / 6;
             if (i > 0)
             {
                 temp2 = temp1 / 6;
